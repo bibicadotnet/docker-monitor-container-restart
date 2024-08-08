@@ -1,0 +1,36 @@
+services:
+  container_monitor:
+    build: ./build
+    container_name: container_monitor
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 20M # giới hạn dùng tối đa 20 MB RAM
+          cpus: '0.1' # giới hạn dùng tối đa 10% của 1 vCPU, trung bình dùng khoảng 1% CPU
+    networks:
+      - monitoring_network
+      - reverse_proxy   # tên mạng của các container cần check đang sử dụng
+  #    - network2
+    environment:
+      TELEGRAM_TOKEN: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      CHAT_ID: "xxxxxxxxx"
+
+       # Các dịch vụ và container muốn kiểm tra
+      SERVICE_1_NAME: "wordpress_bibica_net 9000 PHP"
+      SERVICE_2_NAME: "database_bibica_net 3306 MariaDB"
+      SERVICE_3_NAME: "wordpress_haproxy_tech 9000 PHP"
+      SERVICE_4_NAME: "database_haproxy_tech 3306 MariaDB"
+      SERVICE_5_NAME: "caddy 80 Caddy"
+
+    volumes:
+      - ./container_monitor.log:/var/log/container_monitor.log
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  monitoring_network:
+    driver: bridge
+  reverse_proxy: # tên mạng của các container cần check đang sử dụng
+    external: true
+ # network2:
+ #   external: true
